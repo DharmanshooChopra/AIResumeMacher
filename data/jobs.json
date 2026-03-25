@@ -1,0 +1,213 @@
+{
+  "jobs": [
+    {
+      "job_id": "SE_001",
+      "job_title": "Software Engineer",
+      "experience_required": "0-2 years",
+      "job_summary": "Entry-level Software Engineer role focused on building scalable applications and learning modern development practices.",
+      "required_skills": ["python", "java", "data structures", "algorithms", "oops", "git"],
+      "preferred_skills": ["react", "node.js", "sql", "rest api"],
+      "tools_and_technologies": ["python", "java", "git", "mysql"],
+      "keywords_for_matching": ["software development", "backend", "frontend"]
+    },
+    {
+      "job_id": "SE_101",
+      "job_title": "Software Engineer",
+      "experience_required": "2-5 years",
+      "job_summary": "Develop and maintain scalable backend and frontend systems with strong focus on performance and system design.",
+      "required_skills": ["python", "java", "data structures", "algorithms", "system design", "rest api", "sql", "git"],
+      "preferred_skills": ["microservices", "docker", "kubernetes", "aws", "design patterns"],
+      "tools_and_technologies": ["python", "java", "mysql", "docker", "aws"],
+      "keywords_for_matching": ["scalable systems", "backend", "api development"]
+    },
+
+    {
+      "job_id": "DS_002",
+      "job_title": "Data Scientist",
+      "experience_required": "0-2 years",
+      "job_summary": "Work on data analysis, predictive modeling, and machine learning solutions.",
+      "required_skills": ["python", "statistics", "machine learning", "pandas", "numpy"],
+      "preferred_skills": ["deep learning", "nlp", "tensorflow", "pytorch"],
+      "tools_and_technologies": ["python", "jupyter", "sklearn"],
+      "keywords_for_matching": ["data analysis", "ml", "predictive modeling"]
+    },
+    {
+      "job_id": "DS_102",
+      "job_title": "Data Scientist",
+      "experience_required": "2-5 years",
+      "job_summary": "Build advanced machine learning models and derive insights from large-scale data.",
+      "required_skills": ["python", "machine learning", "statistics", "data analysis", "feature engineering"],
+      "preferred_skills": ["deep learning", "nlp", "model deployment", "tensorflow", "pytorch"],
+      "tools_and_technologies": ["python", "sklearn", "pandas", "mlflow"],
+      "keywords_for_matching": ["predictive modeling", "ml pipelines", "analytics"]
+    },
+
+    {
+      "job_id": "DA_003",
+      "job_title": "Data Analyst",
+      "experience_required": "0-2 years",
+      "job_summary": "Analyze data and generate insights using visualization tools.",
+      "required_skills": ["sql", "excel", "python", "data visualization"],
+      "preferred_skills": ["power bi", "tableau", "statistics"],
+      "tools_and_technologies": ["sql", "excel", "power bi"],
+      "keywords_for_matching": ["data analysis", "dashboard", "reporting"]
+    },
+    {
+      "job_id": "DA_103",
+      "job_title": "Data Analyst",
+      "experience_required": "2-5 years",
+      "job_summary": "Analyze complex datasets and build dashboards for business insights.",
+      "required_skills": ["sql", "python", "data visualization", "statistics", "excel"],
+      "preferred_skills": ["power bi", "tableau", "etl", "data modeling"],
+      "tools_and_technologies": ["sql", "power bi", "tableau"],
+      "keywords_for_matching": ["dashboard", "reporting", "analytics"]
+    },
+
+    {
+      "job_id": "ML_004",
+      "job_title": "Machine Learning Engineer",
+      "experience_required": "0-2 years",
+      "job_summary": "Develop and deploy machine learning models for real-world applications.",
+      "required_skills": ["python", "machine learning", "data structures", "algorithms"],
+      "preferred_skills": ["deep learning", "tensorflow", "pytorch", "mlops"],
+      "tools_and_technologies": ["python", "sklearn", "docker"],
+      "keywords_for_matching": ["ml models", "deployment", "ai"]
+    },
+    {
+      "job_id": "ML_104",
+      "job_title": "Machine Learning Engineer",
+      "experience_required": "2-5 years",
+      "job_summary": "Design, train, and deploy machine learning models into production environments.",
+      "required_skills": ["python", "machine learning", "data structures", "algorithms", "model deployment"],
+      "preferred_skills": ["mlops", "docker", "kubernetes", "aws", "deep learning"],
+      "tools_and_technologies": ["python", "tensorflow", "docker", "aws"],
+      "keywords_for_matching": ["ml pipelines", "deployment", "ai systems"]
+    },
+
+    {
+      "job_id": "WD_005",
+      "job_title": "Web Developer",
+      "experience_required": "0-2 years",
+      "job_summary": "Develop responsive web applications using modern frontend and backend technologies.",
+      "required_skills": ["html", "css", "javascript", "react"],
+      "preferred_skills": ["node.js", "express", "mongodb"],
+      "tools_and_technologies": ["react", "node.js", "git"],
+      "keywords_for_matching": ["web development", "frontend", "backend"]
+    },
+    {
+      "job_id": "WD_105",
+      "job_title": "Web Developer",
+      "experience_required": "2-5 years",
+      "job_summary": "Develop high-performance web applications with modern frontend and backend frameworks.",
+      "required_skills": ["html", "css", "javascript", "react", "node.js", "rest api"],
+      "preferred_skills": ["next.js", "mongodb", "graphql", "typescript"],
+      "tools_and_technologies": ["react", "node.js", "mongodb"],
+      "keywords_for_matching": ["web apps", "frontend", "full stack"]
+    },
+
+    {
+      "job_id": "AD_006",
+      "job_title": "Android Developer",
+      "experience_required": "0-2 years",
+      "job_summary": "Build and maintain Android applications with modern UI/UX practices.",
+      "required_skills": ["java", "kotlin", "android sdk"],
+      "preferred_skills": ["firebase", "rest api", "mvvm"],
+      "tools_and_technologies": ["android studio", "firebase"],
+      "keywords_for_matching": ["mobile development", "android"]
+    },
+    {
+      "job_id": "AD_106",
+      "job_title": "Android Developer",
+      "experience_required": "2-5 years",
+      "job_summary": "Develop robust Android applications with scalable architecture.",
+      "required_skills": ["kotlin", "java", "android sdk", "mvvm", "rest api"],
+      "preferred_skills": ["firebase", "jetpack compose", "clean architecture"],
+      "tools_and_technologies": ["android studio", "firebase"],
+      "keywords_for_matching": ["mobile apps", "android development"]
+    },
+
+    {
+      "job_id": "DE_007",
+      "job_title": "DevOps Engineer",
+      "experience_required": "0-2 years",
+      "job_summary": "Assist in automating deployment pipelines and managing cloud infrastructure.",
+      "required_skills": ["linux", "git", "shell scripting"],
+      "preferred_skills": ["docker", "kubernetes", "aws", "ci/cd"],
+      "tools_and_technologies": ["docker", "jenkins", "aws"],
+      "keywords_for_matching": ["devops", "automation", "cloud"]
+    },
+    {
+      "job_id": "DE_107",
+      "job_title": "DevOps Engineer",
+      "experience_required": "2-5 years",
+      "job_summary": "Manage CI/CD pipelines and automate infrastructure deployment.",
+      "required_skills": ["linux", "shell scripting", "git", "ci/cd", "docker"],
+      "preferred_skills": ["kubernetes", "aws", "terraform", "monitoring tools"],
+      "tools_and_technologies": ["docker", "jenkins", "aws", "kubernetes"],
+      "keywords_for_matching": ["automation", "deployment", "cloud"]
+    },
+
+    {
+      "job_id": "CS_008",
+      "job_title": "Cybersecurity Analyst",
+      "experience_required": "0-2 years",
+      "job_summary": "Monitor and secure systems against cyber threats.",
+      "required_skills": ["network security", "linux", "cryptography basics"],
+      "preferred_skills": ["ethical hacking", "penetration testing", "siem"],
+      "tools_and_technologies": ["wireshark", "kali linux"],
+      "keywords_for_matching": ["security", "threat detection"]
+    },
+    {
+      "job_id": "CS_108",
+      "job_title": "Cybersecurity Analyst",
+      "experience_required": "2-5 years",
+      "job_summary": "Identify vulnerabilities and secure systems against cyber threats.",
+      "required_skills": ["network security", "linux", "penetration testing", "security protocols"],
+      "preferred_skills": ["siem", "ethical hacking", "threat intelligence"],
+      "tools_and_technologies": ["kali linux", "wireshark", "splunk"],
+      "keywords_for_matching": ["security analysis", "threat detection"]
+    },
+
+    {
+      "job_id": "CL_009",
+      "job_title": "Cloud Engineer",
+      "experience_required": "0-2 years",
+      "job_summary": "Work with cloud platforms to deploy and manage applications.",
+      "required_skills": ["cloud computing", "linux", "networking"],
+      "preferred_skills": ["aws", "azure", "docker", "terraform"],
+      "tools_and_technologies": ["aws", "azure", "docker"],
+      "keywords_for_matching": ["cloud", "infrastructure", "deployment"]
+    },
+    {
+      "job_id": "CL_109",
+      "job_title": "Cloud Engineer",
+      "experience_required": "2-5 years",
+      "job_summary": "Design and manage scalable cloud infrastructure and services.",
+      "required_skills": ["cloud computing", "aws", "linux", "networking", "virtualization"],
+      "preferred_skills": ["azure", "docker", "kubernetes", "terraform"],
+      "tools_and_technologies": ["aws", "azure", "docker"],
+      "keywords_for_matching": ["cloud architecture", "infrastructure"]
+    },
+
+    {
+      "job_id": "QA_010",
+      "job_title": "QA Engineer",
+      "experience_required": "0-2 years",
+      "job_summary": "Ensure software quality through manual and automated testing.",
+      "required_skills": ["testing", "test cases", "bug tracking"],
+      "preferred_skills": ["selenium", "automation testing", "java"],
+      "tools_and_technologies": ["selenium", "jira"],
+      "keywords_for_matching": ["testing", "qa", "automation"]
+    },
+    {
+      "job_id": "QA_110",
+      "job_title": "QA Engineer",
+      "experience_required": "2-5 years",
+      "job_summary": "Develop automated testing frameworks and ensure product quality.",
+      "required_skills": ["testing", "automation testing", "selenium", "test design"],
+      "preferred_skills": ["java", "pytest", "ci/cd integration"],
+      "tools_and_technologies": ["selenium", "jira", "pytest"],
+      "keywords_for_matching": ["qa", "automation", "testing"]
+    }
+  ]
+}
