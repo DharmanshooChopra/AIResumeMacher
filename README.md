@@ -97,4 +97,4 @@ You can add or modify job benchmarks by editing `data/jobs.json`. Each job follo
 ```
 
 ---
-© 2026 PortfolioMatch AI | Developed with Python 3.13 Ready Architecture.
+© 2026 AI Resume Macher | Developed with Python 3.13 Ready Architecture.
