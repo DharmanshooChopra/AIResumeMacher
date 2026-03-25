@@ -1,4 +1,4 @@
-# 🛡️ PortfolioMatch AI: Contextual Resume Benchmarking
+# 🛡️ AIResumeMacher: Contextual Resume Benchmarking
 
 PortfolioMatch AI is a production-ready, AI-driven resume parsing and matching engine designed to bridge the gap between job descriptions and professional profiles. It uses a sophisticated hybrid scoring model that combines keyword density with deep semantic understanding to provide a high-fidelity readiness assessment.
 
