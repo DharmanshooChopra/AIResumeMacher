@@ -5,7 +5,7 @@ import pypdfium2 as pdfium
 from utils import load_jobs_data, calculate_weighted_score
 
 # --- CONFIGURATION ---
-st.set_page_config(page_title="PortfolioMatch AI", page_icon="🛡️", layout="wide")
+st.set_page_config(page_title="AI Resume Macher", page_icon="🛡️", layout="wide")
 
 # Custom CSS for Premium Dashboard Experience
 st.markdown("""
