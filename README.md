@@ -1,6 +1,6 @@
-# 🛡️ AIResumeMacher: Contextual Resume Benchmarking
+# 🛡️ AI Resume Macher: Contextual Resume Benchmarking
 
-PortfolioMatch AI is a production-ready, AI-driven resume parsing and matching engine designed to bridge the gap between job descriptions and professional profiles. It uses a sophisticated hybrid scoring model that combines keyword density with deep semantic understanding to provide a high-fidelity readiness assessment.
+AI Resume Macher is a production-ready, AI-driven resume parsing and matching engine designed to bridge the gap between job descriptions and professional profiles. It uses a sophisticated hybrid scoring model that combines keyword density with deep semantic understanding to provide a high-fidelity readiness assessment.
 
 ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.13-3776AB?style=for-the-badge&logo=python&logoColor=white)
