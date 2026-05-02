@@ -1,26 +1,31 @@
 import streamlit as st
 import pdfplumber
-import io
 import pypdfium2 as pdfium
-from utils import load_jobs_data, calculate_weighted_score
+from utils import load_jobs_data, calculate_weighted_score, calculate_topsis_ranking
 
 # --- CONFIGURATION ---
 st.set_page_config(page_title="AI Resume Macher", page_icon="🛡️", layout="wide")
 
-# Custom CSS for Premium Dashboard Experience
 st.markdown("""
     <style>
     .main { background-color: #f7f9fc; }
-    .skill-tag { display: inline-block; padding: 6px 12px; margin: 4px; border-radius: 12px; font-weight: 700; font-size: 0.8rem; }
+    .skill-tag { display: inline-block; padding: 4px 10px; margin: 3px; border-radius: 12px; font-weight: 600; font-size: 0.75rem; }
     .matched { background-color: #dcfce7; color: #15803d; border: 1px solid #86efac; }
     .missing { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
-    .gauge-container { text-align: center; padding: 20px; border-radius: 12px; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
+    .leaderboard-card { padding: 15px; border-radius: 10px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 10px; border-left: 5px solid #4f46e5; }
+    
+    /* NEW RULE: Forces the candidate name to be a dark, readable color */
+    .leaderboard-card h3 { color: #1f2937 !important; }
+    
+    .rank-1 { border-left: 5px solid #fbbf24; background: #fffbeb; }
+    .rank-2 { border-left: 5px solid #9ca3af; background: #f3f4f6; }
+    .rank-3 { border-left: 5px solid #b45309; background: #fff7ed; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- UI HEADER ---
-st.title("🛡️ PortfolioMatch AI: Contextual Resume Benchmarking")
-st.markdown("---")
+st.title("🛡️ PortfolioMatch AI: ATS Leaderboard Engine")
+st.markdown("Batch process resumes and rank them using the **TOPSIS algorithm** (Technique for Order of Preference by Similarity to Ideal Solution).")
+st.divider()
 
 # --- DATA LOADING ---
 jobs = load_jobs_data()
@@ -30,140 +35,107 @@ if not jobs:
 
 job_options = {f"{j.get('job_title')} ({j.get('experience_required')})": j for j in jobs}
 
-# --- SIDEBAR & INPUTS ---
+# --- UI LAYOUT ---
 with st.sidebar:
-    st.header("⚙️ Matching Parameters")
-    st.info("Logic: **70% Keywords** + **30% Semantic Similarity**.")
+    st.header("⚙️ Evaluation Metrics")
+    st.info("The TOPSIS Engine evaluates candidates on a multi-dimensional matrix to find the mathematically ideal hire.")
     st.divider()
-    st.markdown("### 🧬 AI Model Details")
-    st.caption("Model: `multi-qa-mpnet-base-dot-v1`\nParser: `pdfplumber` + `pypdfium2` (Fault Tolerant)")
-
-col1, col2 = st.columns([1, 1], gap="medium")
-
-with col1:
-    st.subheader("1️⃣ Upload Professional Resume")
-    uploaded_file = st.file_uploader("Must be in PDF format", type="pdf")
-
-with col2:
-    st.subheader("2️⃣ Specify Benchmark Position")
-    selected_label = st.selectbox("Role to Match Against", list(job_options.keys()))
+    st.subheader("Benchmark Position")
+    selected_label = st.selectbox("Select Role", list(job_options.keys()), label_visibility="collapsed")
     selected_job = job_options[selected_label]
     
-    with st.expander("💼 Position Snapshot", expanded=False):
-        st.write(f"**Experience Required:** {selected_job.get('experience_required')}")
-        st.write(f"**Summary Highlights:** {selected_job.get('job_summary')}")
-        st.markdown("**Core Skillset Requirements:**")
-        skills_html = "".join([f'<div class="skill-tag" style="background:#e5e7eb; color:#374151;">{s.upper()}</div>' for s in selected_job.get('required_skills', [])])
-        st.markdown(skills_html, unsafe_allow_html=True)
+    st.markdown("**Core Requirements:**")
+    skills_html = "".join([f'<div class="skill-tag" style="background:#e5e7eb; color:#374151;">{s.upper()}</div>' for s in selected_job.get('required_skills', [])])
+    st.markdown(skills_html, unsafe_allow_html=True)
 
-# --- ANALYTICS ENGINE ---
-if st.button("🚀 Execute Contextual Match Analysis", use_container_width=True):
-    try:
-        if uploaded_file:
-            with st.spinner("AI is parsing doc hierarchy and extracting technical vectors..."):
-                
+st.subheader("1️⃣ Upload Candidate Pool (PDFs)")
+# NEW: accept_multiple_files=True enables batch processing
+uploaded_files = st.file_uploader("Upload multiple resumes to generate a ranking.", type="pdf", accept_multiple_files=True)
+
+if st.button("🚀 Run TOPSIS Evaluation Matrix", use_container_width=True):
+    if len(uploaded_files) < 2:
+        st.warning("⚠️ **Notice:** TOPSIS requires at least **two** resumes to create a comparative ranking matrix.")
+    else:
+        with st.spinner(f"Analyzing {len(uploaded_files)} candidates... Extracting vectors and calculating TOPSIS matrix..."):
+            
+            candidates_data = []
+            scoring_matrix = []
+            
+            # --- BATCH PROCESSING LOOP ---
+            for file in uploaded_files:
                 resume_text = ""
                 
-                # --- FAULT-TOLERANT EXTRACTION ENGINE ---
+                # Triple-Layer Fault Tolerant Parser
                 try:
-                    # Primary Attempt: pdfplumber
-                    uploaded_file.seek(0)
-                    with pdfplumber.open(uploaded_file) as pdf:
+                    file.seek(0)
+                    with pdfplumber.open(file) as pdf:
                         resume_text = "\n".join([page.extract_text() for page in pdf.pages if page.extract_text()])
-                    
-                    if not resume_text.strip():
-                        raise ValueError("Empty extraction from pdfplumber")
-                        
+                    if not resume_text.strip(): raise ValueError
                 except Exception:
-                    # Fallback Attempt: pypdfium2 (Bypasses EOF and Root object errors)
                     try:
-                        uploaded_file.seek(0)
-                        # Read raw bytes into memory to prevent file stream closures
-                        file_bytes = uploaded_file.read()
+                        file.seek(0)
+                        file_bytes = file.read()
                         pdf = pdfium.PdfDocument(file_bytes)
-                        
-                        text_pages = []
-                        for i in range(len(pdf)):
-                            page = pdf[i]
-                            textpage = page.get_textpage()
-                            text_pages.append(textpage.get_text_bounded())
-                            
+                        text_pages = [pdf[i].get_textpage().get_text_bounded() for i in range(len(pdf))]
                         resume_text = "\n".join(text_pages)
-                    except Exception as final_e:
-                        st.error(f"❌ **Document Corruption is too severe**: {str(final_e)}")
-                        st.stop()
+                    except Exception:
+                        continue # Skip corrupted files silently in batch mode
+                
+                if not resume_text.strip(): continue
+                
+                # Extract raw sub-scores for the matrix
+                final, matched, missing, sections, kw_score, sem_score = calculate_weighted_score(resume_text, selected_job)
+                
+                # Store data
+                candidates_data.append({
+                    "Name": file.name.replace(".pdf", ""),
+                    "Matched Skills": matched,
+                    "Missing Skills": missing,
+                    "KW_Raw": kw_score,
+                    "SEM_Raw": sem_score
+                })
+                
+                # Build the mathematical matrix for TOPSIS
+                scoring_matrix.append([kw_score, sem_score])
 
-                # Final Validation
-                if not resume_text.strip():
-                    st.error("❌ **Failure: Document Unreadable.** The PDF may be an image scan requiring OCR.")
-                    st.stop()
+            # --- TOPSIS ALGORITHM EXECUTION ---
+            if len(scoring_matrix) > 1:
+                # Weights: 70% Keywords, 30% Semantic Context | Impacts: 1 (Higher is better for both)
+                topsis_scores = calculate_topsis_ranking(scoring_matrix, weights=[0.7, 0.3], impacts=[1, 1])
                 
-                # Execute Scoring Logic from utils.py
-                score, matched, missing, sections = calculate_weighted_score(resume_text, selected_job)
+                # Merge scores back into candidate data and sort by rank
+                for i in range(len(candidates_data)):
+                    candidates_data[i]["TOPSIS Score"] = topsis_scores[i]
                 
-                # UI Results Rendering
+                ranked_candidates = sorted(candidates_data, key=lambda x: x["TOPSIS Score"], reverse=True)
+                
+                # --- RESULTS DASHBOARD ---
                 st.divider()
                 st.balloons()
+                st.subheader("🏆 Candidate Leaderboard")
                 
-                tab_res, tab_skills, tab_sections = st.tabs(["📊 Matching Dashboard", "🔍 Skill Gap Profile", "📑 Document Segment Analysis"])
-                
-                with tab_res:
+                # Render Top 3 visually
+                for idx, candidate in enumerate(ranked_candidates):
+                    rank_class = f"rank-{idx+1}" if idx < 3 else ""
+                    medal = "🥇" if idx == 0 else "🥈" if idx == 1 else "🥉" if idx == 2 else "🔹"
+                    
                     st.markdown(f"""
-                        <div class="gauge-container">
-                            <h3>Overall Match Quality</h3>
-                            <h2 style="color: #4f46e5; font-size: 3.5rem; margin: 10px 0;">{score}%</h2>
+                        <div class="leaderboard-card {rank_class}">
+                            <h3 style="margin-top:0;">{medal} #{idx+1} | {candidate['Name']}</h3>
+                            <h4 style="color: #4f46e5;">TOPSIS Closeness Coefficient: {candidate['TOPSIS Score']}%</h4>
                         </div>
                     """, unsafe_allow_html=True)
-                    st.progress(score / 100)
                     
-                    r_col1, r_col2 = st.columns(2)
-                    with r_col1:
-                        st.subheader("🏁 Readiness Assessment")
-                        if score >= 80:
-                            st.success("🌟 **High-Priority Hire Profile**: Strong technical alignment.")
-                        elif score >= 50:
-                            st.warning("⚖️ **Balanced Profile**: Covers foundational requirements.")
-                        else:
-                            st.error("⚠️ **Low Profile Alignment**: Significant gaps detected.")
-                    
-                    with r_col2:
-                        st.subheader("💡 Strategic Advice")
-                        if missing:
-                            st.info(f"Adding **{missing[0]}** to your profile could significantly improve this ranking.")
-                        else:
-                            st.success("Your resume perfectly reflects the requirements of this role.")
+                    with st.expander(f"View Skill Gap Analysis for {candidate['Name']}"):
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            m_html = "".join([f'<div class="skill-tag matched">{s}</div>' for s in candidate['Matched Skills']])
+                            st.markdown("**✅ Verified Skills:**<br>" + (m_html if m_html else "None"), unsafe_allow_html=True)
+                        with col2:
+                            miss_html = "".join([f'<div class="skill-tag missing">{s}</div>' for s in candidate['Missing Skills']])
+                            st.markdown("**❌ Missing Core Skills:**<br>" + (miss_html if miss_html else "None"), unsafe_allow_html=True)
+            else:
+                st.error("Not enough valid readable resumes were processed to run the TOPSIS algorithm.")
 
-                with tab_skills:
-                    s_col1, s_col2 = st.columns(2)
-                    with s_col1:
-                        st.markdown(f"✅ **Validated Technical Skills ({len(matched)})**")
-                        m_html = "".join([f'<div class="skill-tag matched">{s}</div>' for s in matched])
-                        st.markdown(m_html, unsafe_allow_html=True)
-                    
-                    with s_col2:
-                        st.markdown(f"❌ **Prioritized Requirement Gaps ({len(missing)})**")
-                        miss_html = "".join([f'<div class="skill-tag missing">{s}</div>' for s in missing])
-                        st.markdown(miss_html, unsafe_allow_html=True)
-
-                with tab_sections:
-                    st.subheader("Segments Identified by AI Engine")
-                    if sections:
-                        s_cols = st.columns(len(sections))
-                        for i, (name, content) in enumerate(sections.items()):
-                            with s_cols[i % len(sections)]:
-                                st.markdown(f"**{name.upper()}**")
-                                st.caption(f"{len(content.split())} words")
-                                with st.expander("Review Segment"):
-                                    st.text(content[:800] + ("..." if len(content) > 800 else ""))
-                    else:
-                        st.info("No distinct sections identified; processing as a unified document.")
-        else:
-            st.warning("⚠️ Action Required: Please upload your resume as a PDF.")
-
-    except Exception as e:
-        st.error(f"❌ **System Error Encountered:** {str(e)}")
-        st.info("💡 **Troubleshooting**: If this error persists, try 'Exporting as PDF' again from your source document.")
-
-# --- FOOTER ---
 st.divider()
-st.caption("© 2026 PortfolioMatch AI | Python 3.13 Ready | Multi-Parser Hybrid Engine")
+st.caption("© 2026 PortfolioMatch AI | Python 3.13 Ready | Powered by SBERT & TOPSIS Algorithm")

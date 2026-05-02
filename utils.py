@@ -1,25 +1,10 @@
 import json
 import re
-import spacy
-import os
+import numpy as np
 from sentence_transformers import SentenceTransformer, util
 
-# --- ROBUST MODEL LOADING ---
-def load_spacy_model():
-    """Ensures en_core_web_sm is downloaded and loaded."""
-    try:
-        return spacy.load("en_core_web_sm")
-    except OSError:
-        os.system("python -m spacy download en_core_web_sm")
-        try:
-            return spacy.load("en_core_web_sm")
-        except:
-            return spacy.blank("en")
-
-nlp = load_spacy_model()
-
 # Load high-performance model for long-short text matching
-# 'multi-qa-mpnet-base-dot-v1' is superior for dot-product semantic search
+# (This runs on pure Python/PyTorch, bypassing the spacy DLL blocks)
 model = SentenceTransformer('multi-qa-mpnet-base-dot-v1')
 
 # --- CONFIGURATION & WEIGHTS ---
@@ -32,7 +17,7 @@ SECTION_WEIGHTS = {
     "others": 0.2
 }
 
-# Pre-compiled Regex patterns for Python 3.13+ compatibility (Avoiding 'global flags' error)
+# Pre-compiled Regex patterns for Python 3.13+ compatibility
 URL_PATTERN = re.compile(r'http\S+|www\S+|https\S+')
 EMAIL_PATTERN = re.compile(r'\S+@\S+')
 PHONE_PATTERN = re.compile(r'\+?\d[\d -]{8,}\d')
@@ -86,7 +71,6 @@ def extract_sections(text):
         parsed_sections["others"] = text
         return parsed_sections
     
-    # Text before the first header goes to 'others'
     first_header_line = section_map[0]['line_idx']
     parsed_sections["others"] = "\n".join(lines[:first_header_line])
     
@@ -125,13 +109,11 @@ def calculate_weighted_score(resume_text, job_obj):
         skill_best_weight = 0
         is_found = False
         
-        # Check specific sections for weighted credit
         for sec_name, sec_content in sections.items():
             if skill in sec_content.lower():
                 is_found = True
                 skill_best_weight = max(skill_best_weight, SECTION_WEIGHTS.get(sec_name, 0.2))
         
-        # Backup check for entire text if not found in specific sections
         if not is_found and skill in resume_lower:
             is_found = True
             skill_best_weight = 0.2
@@ -156,4 +138,44 @@ def calculate_weighted_score(resume_text, job_obj):
     
     final_score = (0.7 * keyword_score) + (0.3 * semantic_score)
     
-    return round(final_score), matched_skills, missing_skills, sections
+    return round(final_score), matched_skills, missing_skills, sections, keyword_score, semantic_score
+
+
+# --- 3. ADVANCED DECISION MATRIX (TOPSIS) ---
+def calculate_topsis_ranking(candidates_matrix, weights, impacts):
+    """
+    Ranks a pool of candidates using the TOPSIS geometric algorithm.
+    """
+    matrix = np.array(candidates_matrix, dtype=float)
+    
+    # 1. Normalize the matrix to prevent large numbers from dominating small numbers
+    denom = np.sqrt((matrix**2).sum(axis=0))
+    denom[denom == 0] = 1e-10
+    norm_matrix = matrix / denom
+    
+    # 2. Apply criteria weights
+    weighted_matrix = norm_matrix * weights
+    
+    # 3. Find the Ideal Best and Ideal Worst for each column
+    ideal_best = []
+    ideal_worst = []
+    
+    for i in range(weighted_matrix.shape[1]):
+        if impacts[i] == 1:
+            ideal_best.append(weighted_matrix[:, i].max())
+            ideal_worst.append(weighted_matrix[:, i].min())
+        else:
+            ideal_best.append(weighted_matrix[:, i].min())
+            ideal_worst.append(weighted_matrix[:, i].max())
+            
+    # 4. Calculate geometric distance from the Ideal Best and Worst
+    dist_to_best = np.sqrt(((weighted_matrix - ideal_best)**2).sum(axis=1))
+    dist_to_worst = np.sqrt(((weighted_matrix - ideal_worst)**2).sum(axis=1))
+    
+    # 5. Calculate Closeness Coefficient
+    denominator = dist_to_best + dist_to_worst
+    denominator[denominator == 0] = 1e-10 
+    
+    topsis_scores = dist_to_worst / denominator
+    
+    return [round(score * 100, 2) for score in topsis_scores]
